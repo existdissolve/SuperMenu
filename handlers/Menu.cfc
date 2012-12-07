@@ -1,68 +1,99 @@
 /**
 * A normal ColdBox Event Handler
 */
-component{
-	property name="SettingService" 	inject="SettingService@cb";
+component extends="Base" {
 	property name="SuperMenuService" inject="SuperMenuService@SuperMenu";
-	property name="cb" 				inject="cbHelper@cb";
+	property name="MenuService"		inject="entityService:Menu";
 	property name="PageService"		inject="id:pageService@cb";
 	property name="EntryService"	inject="id:EntryService@cb";
-	property name="CategoryService"	inject="id:CategoryService@cb";
 	property name="MenuItemService" inject="MenuItemService@SuperMenu";
-	property name="ORMService" inject="coldbox:plugin:ORMService";
+	property name="ZoneService"		inject="entityService:Zone";
 	
 	this.prehandler_only = "index,edit";
 	
-	function preHandler( event, rc, prc ) {
+	/**
+    * Prehandler for index/edit events to setup links, common variables, etc.
+    */
+	public void function preHandler( required Any event, required Struct rc, required Struct prc ) {
+		// if data isn't set up correctly, show trouble-shooting page
 		if( !SuperMenuService.isDataSetup() ) {
 			cb.setNextModuleEvent( "SuperMenu", "home.chooseInstallOption" );
 		}
 		else {
+			// links and paths
 			prc.xehCreateMenuLink = cb.buildModuleLink( "SuperMenu", "menu.index" );
     		prc.xehEditLink = cb.buildModuleLink("SuperMenu","menu.edit");
     		prc.xehDeleteLink = cb.buildModuleLink("SuperMenu","menu.delete");
     		prc.moduleRoot = getModuleSettings( "SuperMenu" ).mapping;
-    		prc.editableMenus = [];
-    		//prc.pages = PageService.findPublishedPages();
-    		//prc.blogs = EntryService.findPublishedEntries();
-    		prc.editableMenus = SuperMenuService.getAll();
-    		prc.zones = ORMService.getAll( entityName="Zone" );
+    		// show the black arrow in the modules menu bar?
     		prc.tabModules_SuperMenu = true;
+    		// some lists and what-not
+    		prc.editableMenus = MenuService.getAll();
+    		prc.zones 		  = ZoneService.getAll();
     		prc.miniPagesMenu = SuperMenuService.buildOptionMenu( menu=PageService.findPublishedPages().pages, type="page" );
     		prc.miniBlogsMenu = SuperMenuService.buildOptionMenu( menu=EntryService.findPublishedEntries().entries, type="blog" );
 		}
+		super.preHandler( argumentCollection=arguments );
 	}
-	function index( event, rc, prc ) {
+	
+	/**
+    *  Main entry point for editing menus
+    */
+	public void function index( required Any event, required Struct rc, required Struct prc ) {
+		// set the appropriate view
 		event.setView( "menu/index" );
 	}
-	function edit(event,rc,prc){	
-		prc.menu = SuperMenuService.get( rc.menu );
+	
+	/**
+    * Presents existing menu to be edited
+    */
+	public void function edit( required Any event, required Struct rc, required Struct prc ){	
+		// get menu based on incoming rc parameter
+		prc.menu = MenuService.get( rc.menu );
+		// build out the editable menu content
+		prc.menuContent = SuperMenuService.buildEditableMenu( prc.menu.getItems() );
+		// set the appropriate view
 		event.setView( "menu/index" );
 	}
-	function delete( event, rc, prc ) {
+	
+	/**
+    * Deltes a menu
+    */
+	public void function delete( required Any event, required Struct rc, required Struct prc ) {
+		// get the menu we want to delete
 		var menu = SuperMenuService.get( rc.menu );
+		// do the business
 		SuperMenuService.delete( menu );	
-		// Messagebox
+		// Prepare confirmation message
 		getPlugin( "MessageBox" ).info( "Menu was successfully deleted!" );
 		// Relocate via CB Helper
 		cb.setNextModuleEvent( "SuperMenu", "menu.index" );
 	}
-	function save( event, rc, prc ){
-		// Get super menu settings
-		//prc.settings = getModuleSettings( "SuperMenu" ).settings;
+	
+	/**
+    * Creates a new menu, or updates an existing menu
+    */
+	public void function save( required Any event, required Struct rc, required Struct prc ){
+		// check if this is a new menu or an existing one
 		var isNewMenu = rc.supermenu_id=="" ? true : false;
 		var successMessage = "";
-		var menu = SuperMenuService.get( rc.supermenu_id );
-		var zone = rc.supermenu_zone != "" ? ORMService.get( "Zone", rc.supermenu_zone ) : JavaCast( "null", "" );
+		// get the menu; will be existing instance, or auto-created new instance
+		var menu = MenuService.get( rc.supermenu_id );
+		// get the zone to which the menu is attached (if any)
+		var zone = rc.supermenu_zone != "" ? ZoneService.get( rc.supermenu_zone ) : JavaCast( "null", "" );
+		// set up args for population
 		var menuArgs = {
-			"title"=rc.supermenu_title,
-			"orientation"=rc.supermenu_orientation,
-			"slug"=rc.supermenu_slug
+			Title=rc.supermenu_title,
+			ListType=rc.supermenu_listtype,
+			MenuClass=rc.supermenu_menuclass,
+			Slug=rc.supermenu_slug
 		};
-		SuperMenuService.populate( target=menu, memento=menuArgs );
-		menu.setZone( rc.supermenu_zone != "" ? ORMService.get( "Zone", rc.supermenu_zone ) : JavaCast( "null", "" ) );
+		// populate the model
+		MenuService.populate( target=menu, memento=menuArgs );
+		// if zone is null, update value to null; otherwise, attach the zone instance to the menu
+		menu.setZone( rc.supermenu_zone != "" ? ZoneService.get( rc.supermenu_zone ) : JavaCast( "null", "" ) );
 		// save menu
-		SuperMenuService.save( entity=menu, flush=true );	
+		MenuService.save( entity=menu, flush=true );	
 		// clear all existing menu items
 		MenuItemService.deleteWhere( MenuID=menu );	
 		// save current menuItems

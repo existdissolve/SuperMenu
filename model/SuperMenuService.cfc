@@ -1,34 +1,19 @@
-component extends="coldbox.system.orm.hibernate.VirtualEntityService" accessors="true" singleton {
-	property name="SettingService" 	inject="SettingService@cb";
-
+component accessors="true" singleton {
 	/**
 	* Constructor
 	*/
 	SuperMenuService function init(){
 		// init it
-		super.init( entityName="Menu" );
 		return this;
 	}
-
-	/**
-    * 
-    *
-    */
-	public Array function getMenuList() {
-		/*var menuList = [];
-		var criteria = SettingService.newCriteria();
-		criteria.like( "name", "%cbox-supermenu-menu-%" );
-		var menus = criteria.list();
-		for( var menu in menus ) {
-			var item = deserializeJSON( menu.getValue() );
-			var editable = {
-				"title"=item.title,
-				"id"=item.id
-			};
-			arrayAppend( menuList, editable );
+	public Boolean function isDataSetup() {
+		try {
+			var testMenu = EntityLoad( "Menu" );
+			return true;
 		}
-		return menuList;*/
-		return getAll();
+		catch( Any e ) {
+			return false;
+		}
 	}
 	
 	public String function buildOptionMenu( required Array menu, required Array pageHash=[], required String type="page" ) {
@@ -53,14 +38,84 @@ component extends="coldbox.system.orm.hibernate.VirtualEntityService" accessors=
 		content &="</ul>";
 		return content;
 	}
+	public String function buildEditableMenu( required Array menu, required String menuString="", inChild=false ) {
+		for( var item in arguments.menu ) {
+			var skipItem = false;
+			// check menuMap for itemid
+			if( !isNull( item.getParentID() ) && !inChild ) {
+				skipItem = true;
+			}
+			if( !skipItem ) {
+				menuString &= '<li id="key_#item.getMenuItemID()#">';
+				menuString &= createDraggableHTML( item );
+				if( item.hasChildren() ) {
+					menuString &='<ul>';
+					menuString &= buildEditableMenu( menu=item.getChildren(), inChild=true );
+					menuString &='</ul>';
+				}
+				menuString &='</li>';	
+			}
+		}
+		return menuString;
+	}
 	
-	public Boolean function isDataSetup() {
-		try {
-			var testMenu = EntityLoad( "Menu" );
-			return true;
+	private String function createDraggableHTML( required Any item ) {
+		var extraClass = "";
+		var extraTitle = "";
+		if( item.getType() != "custom" ) {
+			var content = item.getContentID();
+			// if publish date is in the future
+			if( !content.getIsPublished() || content.getPublishedDate() > now() ) {
+				extraClass = "notpublished";
+				extraTitle = "title='This content not published.'";
+			}
+			// if published page has expired
+			if( !isNull( content.getExpireDate() ) && content.getExpireDate() < now() ) {
+				extraClass = "notpublished";
+				extraTitle = "title='This content is expired and no longer published.'";
+			}
 		}
-		catch( Any e ) {
-			return false;
+		var content = '
+            <div class="collapsible_wrapper">
+                <div class="collapsible_title #extraClass#" #extraTitle#>#item.getLabel()#<div class="content_type">#item.getType()#</div><div class="collapse_arrow"></div></div>
+                <div class="collapsible_content">
+                    <table border="0" cellspacing="0" cellpadding="0">
+                		<tr>
+                		    <td>
+                		        <label>Label:</label>
+                		    </td>
+                            <td>
+                                <input type="text" name="label" value="#item.getLabel()#" />
+                            </td>
+                            <td>
+                		        <label>Title:</label>
+                		    </td>
+                            <td>
+                                <input type="text" name="title" value="#item.getTitle()#" />
+                                <input type="hidden" name="type" value="#item.getType()#" />
+                            </td>
+                		</tr>';
+		if( item.getType() == "custom" ) {
+			content &='
+			<tr>
+				<td colspan="1">
+					<label>URL:</label>
+				</td>
+				<td colspan="3">
+					<input type="text" name="url" value="#item.getURL()#" style="width:98%;" />
+				</td>
+			</tr>';
 		}
+		else {
+			content &= '<input type="hidden" name="contentID" value="#item.getContentID().getContentID()#" />';
+		}
+        content &=
+        		    '</table>
+                    <div class="removal">
+                        <a href="javascript:void(0);">Remove Menu Item</a>
+                    </div>
+				</div>
+        	</div>';
+        return content;
 	}
 }

@@ -4,7 +4,9 @@
 component extends="coldbox.system.Plugin" singleton {
 	// DI
 	property name="SuperMenuService" inject="SuperMenuService@SuperMenu";
-	property name="ORMService" inject="coldbox:plugin:ORMService";
+	property name="MenuService" inject="entityService:Menu";
+	property name="ZoneService" inject="entityService:Zone";
+	property name="LinkMenuContentService" inject="entityService:LinkMenuContent";
 	property name="cb" inject="cbHelper@cb";
 	
 	SuperMenu function init( controller ){
@@ -30,27 +32,28 @@ component extends="coldbox.system.Plugin" singleton {
 		var targetZone = "";
 		var menuString = "";
 		var contentID = "";
+		// set flags
 		var hasSlug = structKeyExists( arguments, "slug" ) ? true : false;
 		var hasZone = structKeyExists( arguments, "zone" ) ? true : false;
 		
 		// if we have a slug, try to get the menu based on slug
 		if( hasSlug ) {
 			// get the menu by slug
-    		menu = SuperMenuService.findWhere( criteria={
+    		menu = MenuService.findWhere(criteria={
     			Slug=arguments.slug
     		});
 		}
 		// if we have a zone, try to look it up based on the name
 		if( hasZone ) {
 			// get the zone by name
-    		targetZone = ORMService.findWhere( entityName="Zone", criteria={
+    		targetZone = ZoneService.findWhere(criteria={
     			Name=arguments.zone
     		});
 		}
 		
 		// if no slug is defined BUT we have a target, see if there is a menu defined for this zone
 		if( !isSimpleValue( targetZone ) && !isNull( targetZone ) && !hasSlug ) {
-			menu = SuperMenuService.findAllWhere( criteria={
+			menu = MenuService.findAllWhere(criteria={
 				Zone=targetZone
 			});
 			if( arrayLen( menu ) ) {
@@ -67,12 +70,12 @@ component extends="coldbox.system.Plugin" singleton {
 		}
 		// if we have a contentID, check and see if there are page-level overrides for the zone
 		if( !isSimpleValue( contentID ) && !isSimpleValue( targetZone ) && !isNull( targetZone ) ) {
-			var menuLink = ORMService.findWhere( entityName='LinkMenuContent', criteria={
+			var menuLink = LinkMenuContentService.findWhere(criteria={
 				ContentID = contentID,
 				ZoneID = targetZone
 			});
 			if( !isNull( menuLink ) ) {
-				menu = SuperMenuService.get( menuLink.getMenuID().getMenuID() );
+				menu = MenuService.get( menuLink.getMenuID().getMenuID() );
 			}
 		}
 		// if we have a menu, build out the html for it

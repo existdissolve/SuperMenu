@@ -130,15 +130,7 @@ component {
 	* Fired when the module is activated
 	*/
 	function onActivate(){
-		// active ORM-auto-update during installation
-		var SettingService = controller.getWireBox().getInstance( "SettingService@cb" );
-		// store default settings
-		var setting = SettingService.findWhere( criteria={ name="cbox-supermenu-map" } );
-		if( isNull( setting ) ){
-			var args = { name="cbox-supermenu-map", value=serializeJSON( settings ) };
-			var SuperMenuSettings = SettingService.new(properties=args);
-			SettingService.save( SuperMenuSettings );
-		}
+
 	}
 	
 	/**
@@ -152,15 +144,5 @@ component {
 			// Remove Menu Contribution
 			menuService.removeSubMenu(topMenu=menuService.MODULES,name="SuperMenu");
 		}
-	}
-	/**
-    * Updates Application.cfc to either allow or prevent auto-ORM udpates
-    * @active {String} Flag for whether to activate or disable auto-ORM updates
-    */
-	private void function processORMUpdate( required String active ){
-		var appCFCPath = controller.getAppRootPath() & "Application.cfc";
-		var c = fileRead( appCFCPath );
-		c = active ? replaceNoCase( c, '"none"', '"update"' ) : replaceNoCase( c, '"update"', '"none"' );
-		fileWrite( appCFCPath, c );
 	}
 }

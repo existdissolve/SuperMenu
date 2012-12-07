@@ -7,27 +7,7 @@
 	}
 </cfscript>
 <cfoutput>
-<link href="#prc.moduleRoot#/includes/supermenu_style.css" type="text/css" rel="stylesheet" />
-<style type="text/css">
-    .sortable-menu ul { min-height:10px; }
-    .sortable-menu ul ul {margin-left:40px;}
-    .sortable-menu li {list-style:none;}
-    div.collapsible_wrapper { width: 400px; border:solid 1px ##ccc;border-radius:3px;margin-bottom:5px;background:##efefef; }
-    div.collapsible_title,div.collapsible_content {padding:5px;}
-    div.collapsible_title {background:##dadada;font-weight:bold;cursor:pointer;}
-    .collapsible_content {display:none;}
-    .placeholder {width:400px;outline: 1px dashed ##4183C4;margin-bottom:5px;}
-    .collapse_arrow {width:20px;height:20px;float:right;position:relative;top:5px;right:-5px;background-image:url(#prc.moduleRoot#/includes/images/arrows.png)}
-</style>
-<link href="#prc.moduleRoot#/includes/css/jquery-ui.css" type="text/css" rel="stylesheet" />
-<link href="#prc.moduleRoot#/includes/css/apprise.min.css" type="text/css" rel="stylesheet" />
-<script src="#prc.moduleRoot#/includes/js/jquery.json-2.4.min.js"></script>
-<script src="#prc.moduleRoot#/includes/js/jquery.ui.core.js"></script>
-<script src="#prc.moduleRoot#/includes/js/jquery.ui.widget.js"></script>
-<script src="#prc.moduleRoot#/includes/js/jquery.ui.mouse.js"></script>
-<script src="#prc.moduleRoot#/includes/js/jquery.ui.sortable.js"></script>
-<script src="#prc.moduleRoot#/includes/js/jquery.nestedsortable.js"></script>
-<script src="#prc.moduleRoot#/includes/js/apprise-1.5.min.js"></script>
+#renderView( "viewlets/assets" )#
 #renderView( "viewlets/sidebar" )#
 <!--============================Main Column============================-->
 <div class="main_column">
@@ -92,6 +72,7 @@
             					
             					#html.hiddenField( 
             						name="zoneID",
+									id="zoneID",
             						value="#event.getValue( 'zoneID' )#"
             					)#
             				</fieldset>
@@ -103,33 +84,7 @@
 								</cfif>
             					#html.button(value="Save Zone",class="button",id="save_zone",title="Save this Zone")#
             				</div>
-            			#html.endForm()#
-                        <script>
-                            $( '##save_zone' ).click(function(){
-                                saveZone(); 
-                            });
-                            $( '##delete_zone' ).click(function(){
-                                deleteZone();
-                            })
-                            $( '##zone_selector' ).change(function() {
-                                window.location= $( '##zone_selector option:selected' ).val();
-                            })
-                            function saveZone() {                              
-                                $( '##zone_form' )[0].submit();
-                            }
-                            function deleteZone() {
-                                var form = $( '##zone_form' )[0]
-                                form.action = '#prc.xehDeleteLink#/zone/#event.getValue( "zoneID" )#';
-                                apprise( 'Are you sure you want to delete this zone? This will remove this zone from any menus that specify it.', {
-                                    verify:true
-                                },function(r) {
-                                    if(r) {
-                                        form.submit();
-                                    }
-                                });
-                                return false;
-                            }
-                        </script>
+            			#html.endForm()#                
             		</div>
             	</div>
     		</div>

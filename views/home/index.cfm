@@ -1,5 +1,5 @@
 <cfoutput>
-<link href="#prc.moduleRoot#/includes/supermenu_style.css" type="text/css" rel="stylesheet" />
+#renderView( "viewlets/assets" )#
 #renderView( "viewlets/sidebar" )#
 <!--============================Main Column============================-->
 <div class="main_column">

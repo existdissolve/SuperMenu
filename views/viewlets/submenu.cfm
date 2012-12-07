@@ -1,6 +1,4 @@
 <cfoutput>
-	<cfset runEvent( "SuperMenu:viewlets.setupMyViewlet" )>
-    <cfset announceInterception( "sm_beforesubmenu" )>
     <ul class="sub-menu">
         <li>
             <a href="#prc.cbHelper.buildModuleLink( "SuperMenu", "home.index" )#" <cfif prc.currentView eq "home/index">class="selected"</cfif>>About</a>
@@ -12,5 +10,4 @@
             <a href="#prc.cbHelper.buildModuleLink( "SuperMenu", "menu.index" )#" <cfif prc.currentView eq "menu/index">class="selected"</cfif>>Manage Menus</a>
         </li>
     </ul>
-    <cfset announceInterception( "sm_aftersubmenu" )>
 </cfoutput>
