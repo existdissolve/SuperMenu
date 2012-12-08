@@ -86,17 +86,13 @@ component {
 		routes = [
 			// Module Entry Point
 			{ pattern="/", handler="menu", action="index" },
-			// Edit Menu
-			{ pattern="edit/:menu", handler="menu", action="edit" },
-			// Delete Menu
-			{ pattern="delete/:menu", handler="menu", action="delete" },
 			// Convention Route
 			{ pattern="/:handler/:action?" }	
 		];		
 		
 		// Custom Declared Points
 		interceptorSettings = {
-			customInterceptionPoints = ""
+			customInterceptionPoints = "cbadmin_entryEditorSidebarAccordion"
 		};
 		
 		// Custom Declared Interceptors

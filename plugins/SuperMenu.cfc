@@ -80,8 +80,9 @@ component extends="coldbox.system.Plugin" singleton {
 		}
 		// if we have a menu, build out the html for it
 		if( !isNull( menu ) ) {
+			var listtype = menu.getListType();
 			savecontent variable="menuString" {
-				writeoutput( "<ul>#buildMenu( menu=menu.getItems() )#</ul>" );
+				writeoutput( "<#listtype# class='#menu.getMenuClass()#'>#buildMenu( menu=menu.getItems(), listtype=listtype )#</#listtype#>" );
 			}			
 		}
 		return menuString;
