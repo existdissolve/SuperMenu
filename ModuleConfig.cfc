@@ -46,7 +46,7 @@ component {
 	this.title 				= "SuperMenu";
 	this.author 			= "Joel Watson";
 	this.webURL 			= "http://existdissolve.com";
-	this.description 		= "SuperMenu helps you create customizable menus that can be used anywhere on your ColdBox site";
+	this.description 		= "Super Menu helps you create customizable menus that can be used anywhere on your ContentBox site";
 	this.version			= "1.0";
 	// If true, looks for views in the parent first, if not found, then in the module. Else vice-versa
 	this.viewParentLookup 	= true;
@@ -101,7 +101,6 @@ component {
 		];
 		// services
 		binder.map("SuperMenuService@SuperMenu").to("#moduleMapping#.model.SuperMenuService");
-		binder.map("MenuItemService@SuperMenu").to("#moduleMapping#.model.MenuItemService");
 	}
 	
 	/**
@@ -116,7 +115,7 @@ component {
 			menuService.addSubMenu(
 				topMenu=menuService.MODULES,
 				name="SuperMenu",
-				label="SuperMenu",
+				label="Super Menu",
 				href="#menuService.buildModuleLink( 'SuperMenu', 'menu.index' )#"
 			);
 		}

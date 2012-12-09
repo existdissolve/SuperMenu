@@ -2,6 +2,7 @@
 * A normal ColdBox Event Handler
 */
 component extends="Base" {
+	property name="ORMService" inject="coldbox:plugin:ORMService";
 
 	/**
     * default entry point
@@ -15,6 +16,10 @@ component extends="Base" {
     * sets view and warning message for users when database is not properly configured
     */
 	public void function chooseInstallOption( required Any event, required Struct rc, required Struct prc ) {
+		// get module root
+		prc.moduleRoot = getModuleSettings( "SuperMenu" ).mapping;
+		// show black arrow under link in menu?
+		prc.tabModules_SuperMenu = true;
 		// set warning message
 		getPlugin( "MessageBox" ).warn( "Database is not configured correctly for SuperMenu!" );
 		// set appropriate view
@@ -36,10 +41,14 @@ component extends="Base" {
 			case "auto":
         		// run db script
         		runSQLScript();
-        		// update entities
+        		//update entities
         		activateORMEntities();
 				break;
 		}
+		// reload ORM to process new persistent entities
+		ormReload();
+		// update service references in SuperMenuService
+		SuperMenuService.setupORMServices( true );
 		// installation successful; redirect to menu management
 		cb.setNextModuleEvent( "SuperMenu", "menu" );
 	}
@@ -61,13 +70,13 @@ component extends="Base" {
 				sql = fileRead( getModuleSettings( "SuperMenu" ).path & "/db/install/sm_MySQL.sql" );
 				break;
 			case "SQL Server":
-				
+				sql = fileRead( getModuleSettings( "SuperMenu" ).path & "/db/install/sm_SQLServer.sql" );
 				break;
 			case "Oracle":
-				
+				sql = fileRead( getModuleSettings( "SuperMenu" ).path & "/db/install/sm_Oracle.sql" );
 				break;
 			case "PostgreSQL":
-			
+				sql = fileRead( getModuleSettings( "SuperMenu" ).path & "/db/install/sm_PostgreSQL.sql" );
 				break;
 		}
 		// run the sql script
@@ -83,15 +92,17 @@ component extends="Base" {
     * updates model files to be persistent; need to do this AFTER verificatin of the database to keep CF from exploding
     */
 	private void function activateORMEntities() {
-		// get entity paths
-		var entityPath = getModuleSettings( "SuperMenu" ).modelsPhysicalPath & "/Menu.cfc";
-		// read the file contents
-		var c = fileRead( entityPath );
-		// add "persistent=true"
-		c = replacenocase( c, 'component ','component persistent="true" ', "one" );
-		// overwrite with updates
-		fileWrite( entityPath, c );
-		// reload ORM to process new persistent entities
-		ormReload();
+		var entityPaths = [ "Menu.cfc", "MenuItem.cfc", "Zone.cfc", "LinkMenuContent.cfc" ];
+		var modelPath = getModuleSettings( "SuperMenu" ).modelsPhysicalPath;
+		for( var path in entityPaths ) {
+    		// get entity paths
+    		var entityPath = modelPath & "/orm/#path#";
+    		// read the file contents
+    		var c = fileRead( entityPath );
+    		// add "persistent=true"
+    		c = replacenocase( c, 'component ','component persistent="true" ', "one" );
+    		// overwrite with updates
+    		fileWrite( entityPath, c );	
+		}
 	}
 }

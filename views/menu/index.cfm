@@ -24,7 +24,7 @@
 </cfscript>
 <cfoutput>
 #renderView( "viewlets/assets" )#
-#renderView( "viewlets/sidebar" )#
+#renderView( view="viewlets/sidebar",args={page="menu"} )#
 <!--============================Main Column============================-->
 <div class="main_column">
 	<div class="box">
@@ -141,7 +141,7 @@
             					<label for="supermenu_zone">Zone:</label>
             					<select name="supermenu_zone" class="textfield width98" required=false>
             					    <option value="">--Select a Zone--</option>
-                                    <cfloop array="#prc.zones#" index="zone">
+                                    <cfloop array="#prc.editableZones#" index="zone">
 										<option value="#zone.getZoneID()#" <cfif event.getValue( "zone" ) eq zone.getZoneID()>selected=true</cfif>>#zone.getName()#</option>	
 									</cfloop>
             					</select>

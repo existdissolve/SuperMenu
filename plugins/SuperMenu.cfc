@@ -4,9 +4,6 @@
 component extends="coldbox.system.Plugin" singleton {
 	// DI
 	property name="SuperMenuService" inject="SuperMenuService@SuperMenu";
-	property name="MenuService" inject="entityService:Menu";
-	property name="ZoneService" inject="entityService:Zone";
-	property name="LinkMenuContentService" inject="entityService:LinkMenuContent";
 	property name="cb" inject="cbHelper@cb";
 	
 	SuperMenu function init( controller ){
@@ -24,10 +21,14 @@ component extends="coldbox.system.Plugin" singleton {
 	}
 
 	/**
-	* Render the menu by slug lookup
+	* Render the menu by slug or zone (or both ) lookup
 	* @slug.hint The menu slug that should be rendered
+	* @zone.hint The zone by which to look up the appropriate menu
 	*/
 	public String function renderIt( String slug, String zone ){
+		if( !SuperMenuService.isDataSetup() ) {
+			return "";
+		}
 		var menu = "";
 		var targetZone = "";
 		var menuString = "";
@@ -39,21 +40,21 @@ component extends="coldbox.system.Plugin" singleton {
 		// if we have a slug, try to get the menu based on slug
 		if( hasSlug ) {
 			// get the menu by slug
-    		menu = MenuService.findWhere(criteria={
+    		menu = SuperMenuService.getMenuService().findWhere(criteria={
     			Slug=arguments.slug
     		});
 		}
 		// if we have a zone, try to look it up based on the name
 		if( hasZone ) {
 			// get the zone by name
-    		targetZone = ZoneService.findWhere(criteria={
+    		targetZone = SuperMenuService.getZoneService().findWhere(criteria={
     			Name=arguments.zone
     		});
 		}
 		
 		// if no slug is defined BUT we have a target, see if there is a menu defined for this zone
-		if( !isSimpleValue( targetZone ) && !isNull( targetZone ) && !hasSlug ) {
-			menu = MenuService.findAllWhere(criteria={
+		if( !isNull( targetZone ) && !isSimpleValue( targetZone ) && !hasSlug ) {
+			menu = SuperMenuService.getMenuService().findAllWhere(criteria={
 				Zone=targetZone
 			});
 			if( arrayLen( menu ) ) {
@@ -69,17 +70,17 @@ component extends="coldbox.system.Plugin" singleton {
 			contentID = cb.getCurrentEntry();
 		}
 		// if we have a contentID, check and see if there are page-level overrides for the zone
-		if( !isSimpleValue( contentID ) && !isSimpleValue( targetZone ) && !isNull( targetZone ) ) {
-			var menuLink = LinkMenuContentService.findWhere(criteria={
+		if( !isNull( targetZone ) && !isSimpleValue( contentID ) && !isSimpleValue( targetZone ) ) {
+			var menuLink = SuperMenuService.getLinkMenuContentService().findWhere(criteria={
 				ContentID = contentID,
 				ZoneID = targetZone
 			});
 			if( !isNull( menuLink ) ) {
-				menu = MenuService.get( menuLink.getMenuID().getMenuID() );
+				menu = SuperMenuService.getMenuService().get( menuLink.getMenuID().getMenuID() );
 			}
 		}
 		// if we have a menu, build out the html for it
-		if( !isNull( menu ) ) {
+		if( !isNull( menu ) && !isSimpleValue( menu ) ) {
 			var listtype = menu.getListType();
 			savecontent variable="menuString" {
 				writeoutput( "<#listtype# class='#menu.getMenuClass()#'>#buildMenu( menu=menu.getItems(), listtype=listtype )#</#listtype#>" );
@@ -154,7 +155,7 @@ component extends="coldbox.system.Plugin" singleton {
 					target = "_blank";
 					break;
 			}
-			menuString &= '<a href="#linkPath#" target="#target#" title="#item.getLabel()#">#item.getTitle()#</a>';
+			menuString &= '<a href="#linkPath#" target="#target#" title="#item.getTitle()#">#item.getLabel()#</a>';
 			// if item has children, create sub list items and recurse this method to build those
 			if( item.hasChildren() ) {
 				menuString &='<ul>';

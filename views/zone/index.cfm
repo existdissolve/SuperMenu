@@ -8,7 +8,7 @@
 </cfscript>
 <cfoutput>
 #renderView( "viewlets/assets" )#
-#renderView( "viewlets/sidebar" )#
+#renderView( view="viewlets/sidebar",args={page="zone"} )#
 <!--============================Main Column============================-->
 <div class="main_column">
 	<div class="box">

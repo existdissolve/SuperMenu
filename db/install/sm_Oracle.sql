@@ -1,43 +1,57 @@
-ALTER TABLE "sm_MenuItem" DROP CONSTRAINT "fk_sm_MenuItem";
-ALTER TABLE "sm_LinkMenuPage" DROP CONSTRAINT "fk_sm_LinkMenuPage";
-ALTER TABLE "sm_LinkMenuLayout" DROP CONSTRAINT "fk_sm_LinkMenuLayout";
+DROP TABLE sm_LinkMenuContent;
+DROP TABLE sm_MenuItem;
+DROP TABLE sm_Menu;
+DROP TABLE sm_Zone;
 
-ALTER TABLE "sm_Menu"DROP CONSTRAINT "";
-ALTER TABLE "sm_MenuItem"DROP CONSTRAINT "";
+CREATE TABLE "sm_LinkMenuContent" (
+"LinkMenuContentID" NUMBER(11) NOT NULL,
+"ContentID" NUMBER(11) NOT NULL,
+"MenuID" NUMBER(11) NOT NULL,
+"ZoneID" NUMBER(11) DEFAULT NULL NULL,
+PRIMARY KEY ("LinkMenuContentID") 
+);
 
-DROP TABLE "sm_Menu";
-DROP TABLE "sm_MenuItem";
-DROP TABLE "sm_LinkMenuPage";
-DROP TABLE "sm_LinkMenuLayout";
+CREATE INDEX "MenuID" ON "sm_LinkMenuContent" ("MenuID" );
+CREATE INDEX "ZoneID" ON "sm_LinkMenuContent" ("ZoneID" );
+CREATE INDEX "ContentID" ON "sm_LinkMenuContent" ("ContentID" );
 
 CREATE TABLE "sm_Menu" (
 "MenuID" NUMBER(11) NOT NULL,
+"Title" VARCHAR2(255) DEFAULT '' NOT NULL,
 "Slug" VARCHAR2(255) NOT NULL,
-"Orientation" VARCHAR2(12) NOT NULL,
+"MenuClass" VARCHAR2(255) DEFAULT '' NULL,
+"ListType" VARCHAR2(12) DEFAULT 'ul' NULL,
+"ZoneID" NUMBER(11) DEFAULT NULL NULL,
 PRIMARY KEY ("MenuID") 
 );
+
+CREATE INDEX "fk_sm_Menu_Zone" ON "sm_Menu" ("ZoneID" );
 
 CREATE TABLE "sm_MenuItem" (
 "MenuItemID" NUMBER(11) NOT NULL,
 "MenuID" NUMBER(11) NOT NULL,
 "Label" VARCHAR2(255) NOT NULL,
-"Title" VARCHAR2(255) NULL,
-"Slug" VARCHAR2(255) NOT NULL,
+"Title" VARCHAR2(255) DEFAULT NULL NULL,
+"URL" VARCHAR2(255) DEFAULT '' NULL,
+"ParentID" NUMBER(11) DEFAULT NULL NULL,
+"ContentID" NUMBER(11) DEFAULT NULL NULL,
+"Type" VARCHAR2(255) DEFAULT '' NOT NULL,
 PRIMARY KEY ("MenuItemID") 
 );
 
-CREATE TABLE "sm_LinkMenuPage" (
-"ContentID" NUMBER(11) NOT NULL,
-"MenuID" NUMBER(11) NOT NULL
+CREATE INDEX "ParentID" ON "sm_MenuItem" ("ParentID" );
+CREATE INDEX "sm_MenuID_fk" ON "sm_MenuItem" ("MenuID" );
+CREATE INDEX "ContentID" ON "sm_MenuItem" ("ContentID" );
+
+CREATE TABLE "sm_Zone" (
+"ZoneID" NUMBER(11) NOT NULL,
+"Name" VARCHAR2(255) DEFAULT '' NOT NULL,
+PRIMARY KEY ("ZoneID") 
 );
 
-CREATE TABLE "sm_LinkMenuLayout" (
-"Layout" VARCHAR2(255) NOT NULL,
-"MenuID" NUMBER(11) NOT NULL
-);
-
-
-ALTER TABLE "sm_MenuItem" ADD CONSTRAINT "fk_sm_MenuItem" FOREIGN KEY ("MenuID") REFERENCES "sm_Menu" ("MenuID");
-ALTER TABLE "sm_LinkMenuPage" ADD CONSTRAINT "fk_sm_LinkMenuPage" FOREIGN KEY ("MenuID") REFERENCES "sm_Menu" ("MenuID");
-ALTER TABLE "sm_LinkMenuLayout" ADD CONSTRAINT "fk_sm_LinkMenuLayout" FOREIGN KEY ("MenuID") REFERENCES "sm_Menu" ("MenuID");
-
+ALTER TABLE "sm_LinkMenuContent" ADD CONSTRAINT "sm_LinkMenuContent_ibfk_2" FOREIGN KEY ("ZoneID") REFERENCES "sm_Zone" ("ZoneID") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "sm_LinkMenuContent" ADD CONSTRAINT "sm_LinkMenuContent_ibfk_1" FOREIGN KEY ("MenuID") REFERENCES "sm_Menu" ("MenuID") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "sm_Menu" ADD CONSTRAINT "sm_Menu_ibfk_1" FOREIGN KEY ("ZoneID") REFERENCES "sm_Zone" ("ZoneID") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "sm_MenuItem" ADD CONSTRAINT "sm_MenuItem_ibfk_3" FOREIGN KEY ("ContentID") REFERENCES "cb_content" ("contentID") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "sm_MenuItem" ADD CONSTRAINT "sm_MenuItem_ibfk_1" FOREIGN KEY ("MenuID") REFERENCES "sm_Menu" ("MenuID") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "sm_MenuItem" ADD CONSTRAINT "sm_MenuItem_ibfk_2" FOREIGN KEY ("ParentID") REFERENCES "sm_MenuItem" ("MenuItemID") ON DELETE CASCADE ON UPDATE CASCADE;

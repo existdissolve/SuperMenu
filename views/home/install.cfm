@@ -1,52 +1,33 @@
 <cfoutput>
-<link href="#prc.moduleRoot#/includes/supermenu_style.css" type="text/css" rel="stylesheet" />
-<style type="text/css">
-    .sortable-menu ul { min-height:10px; }
-    .sortable-menu ul ul {margin-left:40px;}
-    .sortable-menu li {list-style:none;}
-    div.collapsible_wrapper { width: 400px; border:solid 1px ##ccc;border-radius:3px;margin-bottom:5px;background:##efefef; }
-    div.collapsible_title,div.collapsible_content {padding:5px;}
-    div.collapsible_title {background:##dadada;font-weight:bold;cursor:pointer;}
-    .collapsible_content {display:none;}
-    .placeholder {width:400px;outline: 1px dashed ##4183C4;margin-bottom:5px;}
-    .collapse_arrow {width:20px;height:20px;float:right;position:relative;top:5px;right:-5px;background-image:url(#prc.moduleRoot#/includes/images/arrows.png)}
-</style>
-<link href="#prc.moduleRoot#/includes/css/jquery-ui.css" type="text/css" rel="stylesheet" />
-<link href="#prc.moduleRoot#/includes/css/apprise.min.css" type="text/css" rel="stylesheet" />
-<script src="#prc.moduleRoot#/includes/js/jquery.json-2.4.min.js"></script>
-<script src="#prc.moduleRoot#/includes/js/jquery.ui.core.js"></script>
-<script src="#prc.moduleRoot#/includes/js/jquery.ui.widget.js"></script>
-<script src="#prc.moduleRoot#/includes/js/jquery.ui.mouse.js"></script>
-<script src="#prc.moduleRoot#/includes/js/jquery.ui.sortable.js"></script>
-<script src="#prc.moduleRoot#/includes/js/jquery.nestedsortable.js"></script>
-<script src="#prc.moduleRoot#/includes/js/apprise-1.5.min.js"></script>
-#renderView( "viewlets/sidebar" )#
+#renderView( "viewlets/assets" )#
+#renderView( view="viewlets/sidebar",args={page="about"} )#
 <!--============================Main Column============================-->
 <div class="main_column">
 	<div class="box">
 		<!--- Body Header --->
 		<div class="header">
-			Super Menu!
+			Super Menu Installation
 		</div>
 		<!--- Body --->
 		<div class="body nobg" id="mainBody">
 		    <!---message box--->
 			#getPlugin("MessageBox").renderit()#
 			<p>
-            	In order to use SuperMenu, a couple new tables need to be added to ContentBox. There are a few options for how to get everything configured properly:
+            	In order to use Super Menu, a couple new tables need to be added to ContentBox. There are a few options for how to get everything configured properly:
             </p>
             <ol>
                 <li>
                     <strong>Full Manual Install:</strong>
-                    Manually create tables (via provided SQL scripts) and manually update SuperMenu entities to be persistent.
+                    Manually create tables (via provided SQL scripts) and manually update Super Menu entities (SuperMenu/model/orm) to be persistent. 
+                    After you've done this, simply reload ORM and you should be ready to roll.
                 </li>
                 <li>
                     <strong>Partial-Automatic:</strong>
-                    Manually create tables (via provided SQL scripts) but automatically setup SuperMenu entities.
+                    Manually create tables (via provided SQL scripts) but automatically setup Super Menu entities.
                 </li> 
             	<li>
             	    <strong>Full Automatic:</strong>
-                    Let SuperMenu create the tables for you AND automatically make necessary file changes.
+                    Let Super Menu create the tables for you AND automatically make necessary file changes.
                 </li>
             </ol>
 			<!--- Navigation Bar --->
@@ -54,6 +35,7 @@
                 <div class="main_column">
 					<!-- Content area that wil show the form and stuff -->
 					<div class="panes_vertical">
+					    #getPlugin( "MessageBox" ).renderMessage( "warning", "You should really consider backing up your files and data before proceeding!" )#
                         <!---start form--->
             			#html.startForm( action="cbadmin.module.supermenu.home.install", name="settingsForm", id="supermenu_form" )#
             				<fieldset>
