@@ -29,27 +29,31 @@ Usage
 =====
 There are several ways to use Super Menu, all with complete flexibility in mind.
 
-*Zones with Default Menus*
+Zones with Default Menus
+------------------------
 One of the most flexible ways to use Super Menu is to create a zone "placeholder" and then associate it with a menu. To do this:
 
 * First, create a zone (e.g., "Sidebar")
 * Next, adjust your layout with the code to embed Super Menu:
-getPlugin( plugin="SuperMenu", module="SuperMenu" ).renderIt( zone="Sidebar" )
+ * getPlugin( plugin="SuperMenu", module="SuperMenu" ).renderIt( zone="Sidebar" )
 * Finally, edit one of your menus and select "Sidebar" as the zone.
 
 The menu should now appear in all pages where the layout with the plugin code is used! And better yet, if you ever change the menu that is associated to the zone, the new menu content will be instantly reflected in your rendered content.
 
-*Menu Slug*
+Menu Slug
+---------
 Of course, you don't have to use zones if you don't want to. You can also simply plunk a menu into a layout or view by using the menu's "slug". To do this:
 
 * First, create your custom menu (e.g., slug="custom-menu")
 * Next, add the folowing to your layout:
-getPlugin( plugin="SuperMenu", module="SuperMenu" ).renderIt( slug="custom-menu" )
+ * getPlugin( plugin="SuperMenu", module="SuperMenu" ).renderIt( slug="custom-menu" )
 * As with the zone example, this will now render the specified menu (by slug) where the plugin code is used.
 
-*Page Overrides for Zones*
-One powerful option with Super Menu is ability to override zone defaults at a page level. To do this:
+Page Overrides for Zones
+------------------------
+One powerful option with Super Menu is ability to override zone defaults at a page or blog entry level. To do this:
 
 * In the desired page, select the menu that you'd like to use for the selected zone.
 * Save the page.
+* 
 You should now see whatever menu you selected when editing the page, regardless of what the menu default for the zone might be.
