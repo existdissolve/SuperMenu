@@ -1,4 +1,4 @@
-component persistent="true" table="sm_LinkMenuContent" {
+component table="sm_LinkMenuContent" {
 
 	// Properties
 	property name="LinkMenuContentID" fieldtype="id" generator="native";

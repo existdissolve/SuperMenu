@@ -1,4 +1,4 @@
-component persistent="true" table="sm_MenuItem" cachename="smMenuItem" cacheuse="read-write" {
+component table="sm_MenuItem" cachename="smMenuItem" cacheuse="read-write" {
 
 	// Non-relational Properties
 	property name="MenuItemID" fieldtype="id" generator="native";

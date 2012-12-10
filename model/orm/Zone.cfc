@@ -1,4 +1,4 @@
-component persistent="true" table="sm_Zone" {
+component table="sm_Zone" {
 
 	// Properties
 	property name="ZoneID" fieldtype="id" generator="native";
