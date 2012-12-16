@@ -51,7 +51,6 @@ component extends="coldbox.system.Plugin" singleton {
     			Name=arguments.zone
     		});
 		}
-		
 		// if no slug is defined BUT we have a target, see if there is a menu defined for this zone
 		if( !isNull( targetZone ) && !isSimpleValue( targetZone ) && !hasSlug ) {
 			menu = SuperMenuService.getMenuService().findAllWhere(criteria={
@@ -59,6 +58,10 @@ component extends="coldbox.system.Plugin" singleton {
 			});
 			if( arrayLen( menu ) ) {
 				menu=menu[1];
+			}
+			// if no menus are found for the zone, reset menu
+			else {
+				menu="";
 			}
 		} 
 		
@@ -79,6 +82,7 @@ component extends="coldbox.system.Plugin" singleton {
 				menu = SuperMenuService.getMenuService().get( menuLink.getMenuID().getMenuID() );
 			}
 		}
+
 		// if we have a menu, build out the html for it
 		if( !isNull( menu ) && !isSimpleValue( menu ) ) {
 			var listtype = menu.getListType();
