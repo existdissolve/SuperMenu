@@ -69,7 +69,7 @@ component extends="Base" {
 			case "MySQL":
 				sql = fileRead( getModuleSettings( "SuperMenu" ).path & "/db/install/sm_MySQL.sql" );
 				break;
-			case "SQL Server":
+			case "Microsoft SQL Server":
 				sql = fileRead( getModuleSettings( "SuperMenu" ).path & "/db/install/sm_SQLServer.sql" );
 				break;
 			case "Oracle":
@@ -81,10 +81,21 @@ component extends="Base" {
 		}
 		// run the sql script
 		if( sql != "" ) {
-			var qs = new query();
+			if( db.DATABASE_PRODUCTNAME=="MySQL" ) {
+				for( var i=1; i<=listLen( sql, ";" ); i++ ) {
+					var statement = listGetAt( sql, i, ";" );
+					var qs = new query();
+    				qs.setDataSource( dsn );
+    				qs.setSql( statement );
+    				qs.execute();
+				}
+			}
+			else {
+				var qs = new query();
 				qs.setDataSource( dsn );
-				qs.setSql( trim( sql ) );
+				qs.setSql( sql );
 				qs.execute();
+			}
 		}
 	}
 	

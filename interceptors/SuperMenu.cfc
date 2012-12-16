@@ -52,9 +52,11 @@ component extends="coldbox.system.Interceptor"{
 	}
 	
 	private void function appendToAccordion( required Any event ) {
-    	// add menuselect view to the sidebar
-		appendToBuffer( 
-			renderView( view='menu/menuselect', module="SuperMenu", args=SuperMenuService.getAccordionContent( event.getCollection() ) ) 
-        );
+		if( SuperMenuService.isDataSetup() ) {
+    		// add menuselect view to the sidebar
+    		appendToBuffer( 
+    			renderView( view='menu/menuselect', module="SuperMenu", args=SuperMenuService.getAccordionContent( event.getCollection() ) ) 
+            );
+        }
     }
 }

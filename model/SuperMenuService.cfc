@@ -85,32 +85,34 @@ component accessors="true" singleton {
 	* returns void
 	*/
 	public void function manageContentMenuLinks( required Struct collection, required Any content ) {
-    	var zones = ZoneService.getAll();
-		for( var zone in zones ) {
-    		// if a menu was selected...
-    		if( structKeyExists( arguments.collection, "supermenu_#zone.getZoneID()#" ) && arguments.collection[ "supermenu_#zone.getZoneID()#" ] != "" ) {
-    			// look up existing item
-    			var menuLink = LinkMenuContentService.findWhere( criteria={
-    				ContentID = arguments.content,
-    				ZoneID = zone
-    			});
-    			// if it doesn't exist, create it
-    			if( isNull( menuLink ) ) {
-    				menuLink = LinkMenuContentService.new( properties={
-    					ContentID = arguments.content
-    				});
-    			}
-    			// set the menu link
-    			menuLink.setMenuID( MenuService.get( arguments.collection[ "supermenu_#zone.getZoneID()#" ] ) );
-    			menuLink.setZoneID( zone );
-    			// save 
-    			LinkMenuContentService.save( entity=menuLink );
+		if( isDataSetup() ) {
+        	var zones = ZoneService.getAll();
+    		for( var zone in zones ) {
+        		// if a menu was selected...
+        		if( structKeyExists( arguments.collection, "supermenu_#zone.getZoneID()#" ) && arguments.collection[ "supermenu_#zone.getZoneID()#" ] != "" ) {
+        			// look up existing item
+        			var menuLink = LinkMenuContentService.findWhere( criteria={
+        				ContentID = arguments.content,
+        				ZoneID = zone
+        			});
+        			// if it doesn't exist, create it
+        			if( isNull( menuLink ) ) {
+        				menuLink = LinkMenuContentService.new( properties={
+        					ContentID = arguments.content
+        				});
+        			}
+        			// set the menu link
+        			menuLink.setMenuID( MenuService.get( arguments.collection[ "supermenu_#zone.getZoneID()#" ] ) );
+        			menuLink.setZoneID( zone );
+        			// save 
+        			LinkMenuContentService.save( entity=menuLink );
+        		}
+        		// otherwise, delete any existing links for this page
+        		else {
+        			LinkMenuContentService.deleteWhere( ContentID = arguments.content, ZoneID=zone );
+        		}	
     		}
-    		// otherwise, delete any existing links for this page
-    		else {
-    			LinkMenuContentService.deleteWhere( ContentID = arguments.content, ZoneID=zone );
-    		}	
-		}	
+    	}	
     }
     
     /**
