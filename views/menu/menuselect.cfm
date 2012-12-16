@@ -3,7 +3,7 @@
         <h2>
         	<img src="#prc.cbRoot#/includes/images/arrow_right.png" alt="" width="6" height="6" class="arrow_right" />
         	<img src="#prc.cbRoot#/includes/images/arrow_down.png" alt="" width="6" height="6" class="arrow_down" />
-        	<img src="#prc.cbroot#/includes/images/filter.png" width=16 height=16 alt="Menus" /> Add Menu
+        	<img src="#prc.cbroot#/includes/images/filter.png" width=16 height=16 alt="Menus" /> Super Menu
         </h2>
         <div class="pane">
             <cfloop array="#args.zones#" index="zone">
