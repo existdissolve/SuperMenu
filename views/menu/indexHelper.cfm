@@ -1,19 +1,25 @@
 <cfoutput>
     <script>
         $( document ).ready(function() {
-            // form validators
+            //****** setup listeners ********//
+            
+            // collapsible menu panels
             $( '.collapsible_title' ).live('click', function(){
                 $( this ).next().slideToggle();
             });
+            // collapsible side panels
             $( '.panel_header' ).click(function() {
                 $( this ).next().slideToggle( 'fast' );
             })
+            // add pages widget
             $( '##page_adder' ).click(function(){
                 addPages( 'page' );
             });
+            // add blog posts widget
             $( '##blog_adder' ).click(function(){
                 addPages( 'blog' );
             });
+            // add links widget
             $( '##link_adder' ).click(function(){
                 var slug = $( '##customlink_slug' ).val();
                 if( $( '##customlink_slug' ).val()=='http://' || $( '##customlink_slug' ).val()=='' ) {
@@ -33,15 +39,18 @@
                 };
                 addLink( data ); 
             });
+            // form buttons
             $( '##save_menu' ).click(function(){
                 saveMenu(); 
             });
             $( '##delete_menu' ).click(function(){
                 deleteMenu();
             })
+            // option selector
             $( '##menu_selector' ).change(function() {
                 window.location= $( '##menu_selector option:selected' ).val();
             })
+            // remove links
             $( '.removal a' ).live('click', function(){
                 var me = this;
                 $( this ).parent( 'div' ).parent( 'div' ).parent( 'div' ).parent( 'li' ).slideToggle(
@@ -51,6 +60,8 @@
                     }
                 );
             });
+            
+            //******** setup sortable menu items **************//
             $('.sortable').nestedSortable({
                 handle: 'div',
                 items: 'li',
@@ -59,11 +70,21 @@
                 placeholder: 'placeholder',
                 forcePlaceholderSize: true
             });
+            
+            //************* helper functions ***********//
+            
+            /**
+             * gets a hierarchical json representation of the menus
+             */
             function getMenu() {
                 var hierarchy = $('.sortable').nestedSortable( 'toHierarchy' );
                 console.log( hierarchy )
                 console.log( $.quoteString( $.toJSON( hierarchy ) ) );
             }
+            
+            /**
+             * validates and saves the sortable menu
+             */
             function saveMenu() {
                 var hierarchy = $('.sortable').nestedSortable( 'toHierarchy' );
                 var errors = '';
@@ -83,6 +104,10 @@
                 $( 'input[name=supermenu_content]' ).val( $.toJSON( hierarchy ) );
                 $( '##supermenu_form' )[0].submit();
             }
+            
+            /**
+             * deletes the menu
+             */
             function deleteMenu() {
                 var form = $( '##supermenu_form' )[0];
                 var id = $( '##menuID' ).val();
@@ -96,6 +121,11 @@
                 });
                 return false;
             }
+            
+            /**
+             * Adds a page or blog entry item to the sortable menu
+             * type {String} the type of pages being added
+             */
             function addPages( type ) {
                 $( '##' + type + '_selector' ).find( 'input[type=checkbox]:checked' ).each(function( index ) {
                     var selector = $( this ).attr('id').split('_')[1];
@@ -109,6 +139,11 @@
                     addPage( data );
                 });
             }
+            
+            /**
+             * Wraps page or blog entry data up into an html structure that will be inserted into the DOM
+             * data {Object} the data that will populate the html elements
+             */
             function addPage( data ) {
                 var sortable = $( '.sortable' );
                 var content = [
@@ -156,6 +191,12 @@
                     $( this ).removeAttr( 'checked' );
                 });
             }
+            
+           	/**
+             * Wraps link data up into an html structure that will be inserted into the DOM
+             * data {Object} the data that will populate the html elements
+             */
+            // TODO: merge with addPage
             function addLink( data ) {
                 var sortable = $( '.sortable' );                        
                 var content = [

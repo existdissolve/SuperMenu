@@ -200,6 +200,99 @@ component accessors="true" singleton {
 	}
 	
 	/**
+    * Reverts child services of this service
+    * returns void
+    */
+	public void function teardownORMServices() {
+		setMenuService( "" );
+		setMenuItemService( "" );
+		setZoneService( "" );
+		setLinkMenuContentService( "" );
+	}
+	
+	/**
+    * runs a static SQL script (based on configured database type) to install needed tables
+    */	
+	public void function runSQLScript() {
+		// get orm utils
+		var orm = new coldbox.system.orm.hibernate.util.ORMUtilFactory().getORMUtil();
+		// figure out the default datasource
+		var dsn = orm.getDefaultDatasource();
+		// use dbinfo to lookup db version
+		var db = new dbinfo( datasource=dsn ).version();
+		var sql = "";
+		// switch on db version
+		switch( db.DATABASE_PRODUCTNAME ) {
+			case "MySQL":
+				sql = fileRead( cb.getModuleSettings( "SuperMenu" ).path & "/db/install/sm_MySQL.sql" );
+				break;
+			case "Microsoft SQL Server":
+				sql = fileRead( cb.getModuleSettings( "SuperMenu" ).path & "/db/install/sm_SQLServer.sql" );
+				break;
+			case "Oracle":
+				sql = fileRead( cb.getModuleSettings( "SuperMenu" ).path & "/db/install/sm_Oracle.sql" );
+				break;
+			case "PostgreSQL":
+				sql = fileRead( cb.getModuleSettings( "SuperMenu" ).path & "/db/install/sm_PostgreSQL.sql" );
+				break;
+		}
+		// run the sql script
+		if( sql != "" ) {
+			if( db.DATABASE_PRODUCTNAME=="MySQL" ) {
+				for( var i=1; i<=listLen( sql, ";" ); i++ ) {
+					var statement = listGetAt( sql, i, ";" );
+					var qs = new query();
+    				qs.setDataSource( dsn );
+    				qs.setSql( statement );
+    				qs.execute();
+				}
+			}
+			else {
+				var qs = new query();
+				qs.setDataSource( dsn );
+				qs.setSql( sql );
+				qs.execute();
+			}
+		}
+	}
+	
+	/**
+    * updates model files to be persistent; need to do this AFTER verificatin of the database to keep CF from exploding
+    */
+	public void function activateORMEntities() {
+		var entityPaths = [ "Menu.cfc", "MenuItem.cfc", "Zone.cfc", "LinkMenuContent.cfc" ];
+		var modelPath = cb.getModuleSettings( "SuperMenu" ).modelsPhysicalPath;
+		for( var path in entityPaths ) {
+    		// get entity paths
+    		var entityPath = modelPath & "/orm/#path#";
+    		// read the file contents
+    		var c = fileRead( entityPath );
+    		// add "persistent=true"
+    		c = replacenocase( c, 'component ','component persistent="true" ', "one" );
+    		// overwrite with updates
+    		fileWrite( entityPath, c );	
+		}
+	}
+	
+	/**
+    * updates model files to no longer be persistent; will let developers take care of cleaning up db tables for now...
+    */
+    public void function deactivateORMEntities() {
+    	var entityPaths = [ "Menu.cfc", "MenuItem.cfc", "Zone.cfc", "LinkMenuContent.cfc" ];
+		var modelPath = cb.getModuleSettings( "SuperMenu" ).modelsPhysicalPath;
+		for( var path in entityPaths ) {
+    		// get entity paths
+    		var entityPath = modelPath & "/orm/#path#";
+    		// read the file contents
+    		var c = fileRead( entityPath );
+    		// add "persistent=true"
+    		c = replacenocase( c, 'persistent="true"','', "one" );
+    		// overwrite with updates
+    		fileWrite( entityPath, c );	
+		}
+    }
+	
+	/**
 	* puts together an option menu for different types
 	* @menu {Array} the menu whose items will become the menu
 	* @pageHash {Array} tracker cache to prevent dupes

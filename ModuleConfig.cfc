@@ -129,6 +129,15 @@ component {
 	}
 	
 	/**
+	* Fired when the module is deactivated
+	*/
+	function onDeactivate() {
+		var SuperMenuService = controller.getWireBox().getInstance( "SuperMenuService@SuperMenu" );
+		SuperMenuService.deactivateORMEntities();
+		SuperMenuService.teardownORMServices();
+	}
+	
+	/**
 	* Fired when the module is unregistered and unloaded
 	*/
 	function onUnload(){
