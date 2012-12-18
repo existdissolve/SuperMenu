@@ -1,0 +1,1 @@
+<cfdbinfo type="version" datasource="#dsn#" name="result">

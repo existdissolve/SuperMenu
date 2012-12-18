@@ -218,14 +218,18 @@ component accessors="true" singleton {
 		var orm = new coldbox.system.orm.hibernate.util.ORMUtilFactory().getORMUtil();
 		// figure out the default datasource
 		var dsn = orm.getDefaultDatasource();
+		include "DBInfo.cfm";
 		// use dbinfo to lookup db version
-		var db = new dbinfo( datasource=dsn ).version();
+		var db = result.database_productname;
 		var sql = "";
 		// switch on db version
-		switch( db.DATABASE_PRODUCTNAME ) {
+		switch( db ) {
 			case "MySQL":
 				sql = fileRead( cb.getModuleSettings( "SuperMenu" ).path & "/db/install/sm_MySQL.sql" );
 				break;
+            case "HSQL Database Engine":
+            	sql = fileRead( cb.getModuleSettings( "SuperMenu" ).path & "/db/install/sm_HSQL.sql" );
+            	break;
 			case "Microsoft SQL Server":
 				sql = fileRead( cb.getModuleSettings( "SuperMenu" ).path & "/db/install/sm_SQLServer.sql" );
 				break;
@@ -238,7 +242,7 @@ component accessors="true" singleton {
 		}
 		// run the sql script
 		if( sql != "" ) {
-			if( db.DATABASE_PRODUCTNAME=="MySQL" ) {
+			if( db=="MySQL" || db=="HSQL Database Engine" ) {
 				for( var i=1; i<=listLen( sql, ";" ); i++ ) {
 					var statement = listGetAt( sql, i, ";" );
 					var qs = new query();

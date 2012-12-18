@@ -50,7 +50,7 @@
 					    <!---message box--->
 						#getPlugin("MessageBox").renderit()#
                         <!---start form--->
-            			#html.startForm( action="cbadmin.module.supermenu.zone.save", name="zoneForm", id="zone_form" )#
+            			#html.startForm( action="#prc.cbhelper.buildModuleLink( 'SuperMenu', 'zone.save')#", name="zoneForm", id="zone_form" )#
             				<fieldset>
                 				<legend>
                 				    <img src="#prc.cbRoot#/includes/images/settings_black.png" alt="modifiers"/> 

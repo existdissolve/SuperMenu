@@ -97,7 +97,7 @@
 					<!-- Content area that wil show the form and stuff -->
 					<div class="panes_vertical">
                         <!---start form--->
-            			#html.startForm( action="cbadmin.module.supermenu.menu.save", name="menuForm", id="supermenu_form" )#
+            			#html.startForm( action="#prc.cbhelper.buildModuleLink( 'SuperMenu', 'menu.save')#", name="menuForm", id="supermenu_form" )#
             				<fieldset>
                 				<legend>
                 				    <img src="#prc.cbRoot#/includes/images/settings_black.png" alt="modifiers"/> 

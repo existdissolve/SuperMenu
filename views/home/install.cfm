@@ -37,7 +37,7 @@
 					<div class="panes_vertical">
 					    #getPlugin( "MessageBox" ).renderMessage( "warning", "You should really consider backing up your files and data before proceeding!" )#
                         <!---start form--->
-            			#html.startForm( action="cbadmin.module.supermenu.home.install", name="settingsForm", id="supermenu_form" )#
+            			#html.startForm( action="#prc.cbhelper.buildModuleLink( 'SuperMenu', 'home.install')#", name="settingsForm", id="supermenu_form" )#
             				<fieldset>
                 				<legend>
                 				    <img src="#prc.cbRoot#/includes/images/settings_black.png" alt="modifiers"/> 
