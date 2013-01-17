@@ -125,11 +125,11 @@ component extends="coldbox.system.Plugin" singleton {
 			// if blog or page, check if item is published
 			if( !isNull( content ) && !isSimpleValue( content ) ) {
 				// if publish date is in the future
-				if( !content.getIsPublished() || content.getPublishedDate() > now() ) {
+				if( content.isPublishedInFuture() ) {
 					continue;
 				}
 				// if published page has expired
-				if( !isNull( content.getExpireDate() ) && content.getExpireDate() < now() ) {
+				if( content.isExpired() ) {
 					continue;
 				}
 			}

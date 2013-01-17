@@ -343,12 +343,12 @@ component accessors="true" singleton {
 		if( item.getType() != "custom" ) {
 			var pagecontent = item.getContentID();
 			// if publish date is in the future
-			if( !pagecontent.getIsPublished() || pagecontent.getPublishedDate() > now() ) {
+			if( pagecontent.isPublishedInFuture() ) {
 				extraClass = "notpublished";
 				extraTitle = "title='This content not published.'";
 			}
 			// if published page has expired
-			if( !isNull( pagecontent.getExpireDate() ) && pagecontent.getExpireDate() < now() ) {
+			if( pagecontent.isExpired() ) {
 				extraClass = "notpublished";
 				extraTitle = "title='This content is expired and no longer published.'";
 			}
